@@ -27,10 +27,8 @@ function [sBest, iterations] = grasp(G, Candidates, n, alpha, Wmax, Cmax, timeLi
     bestVal = inf;
 
     while toc(t) < timeLimit
-        % Fase 1: construção greedy randomizada
         s = greedyRandomized(G, Candidates, n, alpha);
 
-        % Fase 2: local search (cópia do sa_hc_def1 do ex04, com Wmax e Cmax)
         [s, sVal] = sa_hc_def1(G, s, Wmax, Cmax);
 
         if sVal < bestVal
@@ -50,27 +48,24 @@ function sNodes = greedyRandomized(G, Candidates, n, alpha)
         remaining = setdiff(Candidates, sNodes);
         nRem = length(remaining);
 
-        % Avalia cada candidato restante
         costs = zeros(1, nRem);
         for i = 1:nRem
             partial = [sNodes, remaining(i)];
-            D = distances(G, partial);       % delays de todos os nós aos candidatos parciais
-            minDelays = min(D, [], 1);       % delay mínimo de cada nó ao mais próximo
-            costs(i) = mean(minDelays);      % delay médio
+            D = distances(G, partial);
+            minDelays = min(D, [], 1);
+            costs(i) = mean(minDelays);
         end
-
-        % Constrói a RCL
+       
         cMin = min(costs);
         cMax = max(costs);
         RCL = remaining(costs <= cMin + alpha * (cMax - cMin));
 
-        % Escolhe aleatoriamente da RCL
+        
         sNodes = [sNodes, RCL(randi(length(RCL)))];
     end
 end
 
 
-% Cópia do sa_hc_def1 do ex04, com Wmax e Cmax como parâmetros
 function [sNodes, objVal] = sa_hc_def1(G, sNodes, Wmax, Cmax)
     nNodes = numnodes(G);
     
