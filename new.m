@@ -12,29 +12,22 @@ Wmax = 700;
 Cmax = 500;
 timeLimit = 60;
 
-% Parâmetros GRASP
 alpha = 0.3;
 
-% Parâmetros GA
 P_size = 100; q = 0.1; m = 5; k = 2;
 
-% Correr GRASP
 [sBest_grasp, iterations_grasp] = grasp(G, Candidates, n, alpha, Wmax, Cmax, timeLimit);
 [avgNS_grasp, maxNS_grasp, maxSS_grasp] = ObjectiveSNSP(G, sBest_grasp, true, true, true);
 
-% Correr GA
 [sBest_ga, nPop_ga, runtimeBest_ga] = ga(G, Candidates, n, P_size, q, m, k, Wmax, Cmax, timeLimit);
 [avgNS_ga, maxNS_ga, maxSS_ga] = ObjectiveSNSP(G, sBest_ga, true, true, true);
 
-% Prints
 fprintf("GRASP - alpha = %.2f, iterations = %d\n", alpha, iterations_grasp);
 fprintf("avgNS = %.2f\t maxNS = %d\t maxSS = %d\n\n", avgNS_grasp, maxNS_grasp, maxSS_grasp);
 
 fprintf("GA - populations = %d, runtimeBest = %.2f\n", nPop_ga, runtimeBest_ga);
 fprintf("avgNS = %.2f\t maxNS = %d\t maxSS = %d\n\n", avgNS_ga, maxNS_ga, maxSS_ga);
 
-
-% ---- FUNÇÕES ----
 
 function [sBest, iterations] = grasp(G, Candidates, n, alpha, Wmax, Cmax, timeLimit)
     t = tic;
