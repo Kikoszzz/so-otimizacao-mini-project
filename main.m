@@ -1,138 +1,176 @@
-%% Script Definitivo de Otimização - Simulação e Otimização
-clear all; close all; clc;
+Nodes = load("Nodes200.txt");
+Links = load("Links200.txt");
+L = load("L200.txt");
+Candidates = load("Candidates.txt");
 
-fprintf('=========================================================\n');
-fprintf('   Carregando os Ficheiros de Suporte e Configuração     \n');
-fprintf('=========================================================\n');
+nNodes = size(Nodes, 1);
+nLinks = size(Links, 1);
+G = graph(L);
 
-% 1. Carregar Dados Reais da Rede de 200 nós
-Nodes = load('Nodes200.txt');      
-Links = load('Links200.txt');      
-L = load('L200.txt');              
-candidates = load('Candidates.txt'); 
+n = 8;
+Wmax = 700;
+Cmax = 500;
+timeLimit = 60;
 
-if iscolumn(candidates)
-    candidates = candidates';
-end
+alpha = 0.3;
 
-nNodes = size(Nodes,1);
-G = graph(L); % Construir o Grafo através da matriz de adjacência L
+P_size = 100; q = 0.1; m = 5; k = 2;
 
-% Parâmetros Oficiais do Mini-Projeto
-n = 8;          % Número de controladores
-Wmax = 700;     % Limite Switch-Controlador
-Cmax = 500;     % Limite Inter-Controlador
-timeLimit = 60; % Limite estrito de 60 segundos por corrida
+[sBest_grasp, iterations_grasp] = grasp(G, Candidates, n, alpha, Wmax, Cmax, timeLimit);
+[avgNS_grasp, maxNS_grasp, maxSS_grasp] = ObjectiveSNSP(G, sBest_grasp, true, true, true);
 
-fprintf('Rede de %d nós e %d candidatos azuis carregada com sucesso.\n\n', nNodes, numel(candidates));
+[sBest_ga, nPop_ga, runtimeBest_ga] = ga(G, Candidates, n, P_size, q, m, k, Wmax, Cmax, timeLimit);
+[avgNS_ga, maxNS_ga, maxSS_ga] = ObjectiveSNSP(G, sBest_ga, true, true, true);
 
-%% =======================================================================
-%  MENU DE SELEÇÃO NA CONSOLA
-% =======================================================================
-fprintf('Escolha o algoritmo que deseja executar:\n');
-fprintf('  [1] - f2 (Pesquisa Local com Penalização)\n');
-fprintf('  [2] - f3 (Random Search com Rejeição Pura)\n');
-fprintf('  [3] - GRASP (Metaheurística Oficial - Construtivo + Local)\n');
-fprintf('  [4] - GA (Metaheurística Oficial - Algoritmo Genético)\n');
+fprintf("GRASP - alpha = %.2f, iterations = %d\n", alpha, iterations_grasp);
+fprintf("avgNS = %.2f\t maxNS = %d\t maxSS = %d\n\n", avgNS_grasp, maxNS_grasp, maxSS_grasp);
 
-opcao = input('\nIntroduza o número da sua opção [1-4]: ');
-
-sNodes = [];
-nomeAlgoritmo = '';
-
-switch opcao
-    case 1
-        nomeAlgoritmo = 'Pesquisa Local (f2)';
-        fprintf('\nA executar %s por %d segundos...\n', nomeAlgoritmo, timeLimit);
-        sNodes = f2(G, n, timeLimit, candidates);
-        
-    case 2
-        nomeAlgoritmo = 'Random Search (f3)';
-        fprintf('\nA executar %s por %d segundos...\n', nomeAlgoritmo, timeLimit);
-        sNodes = f3(G, n, timeLimit, candidates);
-        
-    case 3
-        nomeAlgoritmo = 'GRASP Oficial';
-        r = 5; % Tamanho da RCL (Parâmetro a afinar nos teus testes)
-        fprintf('\nA executar %s (r=%d) por %d segundos...\n', nomeAlgoritmo, r, timeLimit);
-        [sNodes, bestAvg, nIter, runtime] = GRASP(G, L, candidates, n, Wmax, Cmax, r, timeLimit);
-        fprintf('Iterações completadas pelo GRASP: %d\n', nIter);
-        
-    case 4
-        nomeAlgoritmo = 'Algoritmo Genético (GA) Oficial';
-        popSize = 100; mutProb = 0.1; elitismM = 5; tournK = 2; % Setup padrão
-        fprintf('\nA executar %s por %d segundos...\n', nomeAlgoritmo, timeLimit);
-        [sNodes, bestAvg, nPop, runtime] = GA(G, L, candidates, n, Wmax, Cmax, popSize, mutProb, elitismM, tournK, timeLimit);
-        fprintf('Gerações evoluídas pelo GA: %d\n', nPop);
-        
-    otherwise
-        error('Opção inválida. Execute o script novamente e selecione um número de 1 a 4.');
-end
-
-%% =======================================================================
-%  APRESENTAÇÃO DOS RESULTADOS E GRÁFICOS
-% =======================================================================
-if ~isempty(sNodes)
-    [avgNS, maxNS, maxSS] = ObjectiveSNSP(G, sNodes, true, true, true);
-    
-    fprintf('\n================ RESULTADOS FINAIS: %s =================\n', upper(nomeAlgoritmo));
-    fprintf('Melhores Nós Selecionados: [%s]\n', num2str(sNodes));
-    fprintf('Atraso Médio (avgNS):       %.4f (Minimizar)\n', avgNS);
-    fprintf('Atraso Máximo (maxNS/Wmax): %.4f (Deve ser <= 700)\n', maxNS);
-    fprintf('Atraso Inter-Ctrl (maxSS/Cmax): %.4f (Deve ser <= 500)\n', maxSS);
-    fprintf('========================================================================\n');
-    
-    % Desenhar os Gráficos das tuas Support Functions
-    figure(1); plotClientPaths(Nodes, Links, sNodes, G);
-    figure(2); plotWorstClientPath(Nodes, Links, sNodes, G);
-    figure(3); plotWorstServerPath(Nodes, Links, sNodes, G);
-else
-    fprintf('\n[AVISO]: O algoritmo não conseguiu encontrar nenhuma solução válida no tempo limite.\n');
-end
+fprintf("GA - populations = %d, runtimeBest = %.2f\n", nPop_ga, runtimeBest_ga);
+fprintf("avgNS = %.2f\t maxNS = %d\t maxSS = %d\n\n", avgNS_ga, maxNS_ga, maxSS_ga);
 
 
-%% =======================================================================
-%  FUNÇÕES AUXILIARES LOCAIS (f2 e f3)
-% =======================================================================
-function sNodes = f2(G, n, time, candidates)
+function [sBest, iterations] = grasp(G, Candidates, n, alpha, Wmax, Cmax, timeLimit)
     t = tic;
-    nCands = numel(candidates);
-    idx = randperm(nCands, n);
-    sNodes = candidates(idx);
+    iterations = 0;
+    sBest = [];
+    bestVal = inf;
+
+    while toc(t) < timeLimit
+        s = greedyRandomized(G, Candidates, n, alpha);
+        [s, sVal] = sa_hc_def1(G, s, Wmax, Cmax);
+
+        if sVal < bestVal
+            bestVal = sVal;
+            sBest = s;
+        end
+
+        iterations = iterations + 1;
+    end
+end
+
+
+function sNodes = greedyRandomized(G, Candidates, n, alpha)
+    sNodes = [];
+
+    for step = 1:n
+        remaining = setdiff(Candidates, sNodes);
+        nRem = length(remaining);
+
+        costs = zeros(1, nRem);
+        for i = 1:nRem
+            partial = [sNodes, remaining(i)];
+            D = distances(G, partial);
+            minDelays = min(D, [], 1);
+            costs(i) = mean(minDelays);
+        end
+
+        cMin = min(costs);
+        cMax = max(costs);
+        RCL = remaining(costs <= cMin + alpha * (cMax - cMin));
+
+        sNodes = [sNodes, RCL(randi(length(RCL)))];
+    end
+end
+
+
+function [sNodes, objVal] = sa_hc_def1(G, sNodes, Wmax, Cmax)
+    nNodes = numnodes(G);
+
     [avgNS, maxNS, maxSS] = ObjectiveSNSP(G, sNodes, true, true, true);
     objVal = avgNS;
-    if maxNS > 700, objVal = objVal + 10000 * (maxNS - 700); end
-    if maxSS > 500, objVal = objVal + 10000 * (maxSS - 500); end
-    best = objVal;
-    while toc(t) < time
-        Others = setdiff(candidates, sNodes);
-        nOthers = numel(Others);
-        if nOthers == 0, break; end
-        Neigh = [sNodes(randperm(n, n-1)), Others(randperm(nOthers, 1))];
-        [avgNS, maxNS, maxSS] = ObjectiveSNSP(G, Neigh, true, true, true);
-        objVal = avgNS;
-        if maxNS > 700, objVal = objVal + 10000 * (maxNS - 700); end
-        if maxSS > 500, objVal = objVal + 10000 * (maxSS - 500); end
-        if objVal < best
-            sNodes = Neigh;
-            best = objVal;
+    if maxNS > Wmax, objVal = objVal + 100 * (maxNS - Wmax); end
+    if maxSS > Cmax, objVal = objVal + 100 * (maxSS - Cmax); end
+
+    improved = true;
+
+    while improved
+        improved = false;
+        Others = setdiff(1:nNodes, sNodes);
+        bestVal = objVal;
+        bestNeighbor = sNodes;
+
+        for a = sNodes
+            for b = Others
+                Neigh = [setdiff(sNodes, a), b];
+
+                [avgNS, maxNS, maxSS] = ObjectiveSNSP(G, Neigh, true, true, true);
+                val = avgNS;
+                if maxNS > Wmax, val = val + 100 * (maxNS - Wmax); end
+                if maxSS > Cmax, val = val + 100 * (maxSS - Cmax); end
+
+                if val < bestVal
+                    bestVal = val;
+                    bestNeighbor = Neigh;
+                end
+            end
+        end
+
+        if bestVal < objVal
+            sNodes = bestNeighbor;
+            objVal = bestVal;
+            improved = true;
         end
     end
 end
 
-function sNodes = f3(G, n, time, candidates)
+
+function [sBest, nPop, runtimeBest] = ga(G, Candidates, n, P_size, q, m, k, Wmax, Cmax, timeLimit)
     t = tic;
-    nCands = numel(candidates);
-    best = inf; sNodes = []; counter = 0;
-    while toc(t) < time
-        counter = counter + 1;
-        idx = randperm(nCands, n);
-        aux = candidates(idx);
-        [avgNS, maxNS, maxSS] = ObjectiveSNSP(G, aux, true, true, true);
-        if avgNS < best && maxNS <= 700 && maxSS <= 500 && maxNS ~= -1
-            sNodes = aux;
-            best = avgNS;
+    nCandidates = length(Candidates);
+
+    P = zeros(P_size, n+1);
+    for i = 1:P_size
+        sol = Candidates(randperm(nCandidates, n));
+        P(i, 1:n) = sol;
+        P(i, n+1) = calculateFitness(G, sol, Wmax, Cmax);
+    end
+
+    P = sortrows(P, n+1);
+
+    sBest = P(1, 1:n);
+    bestVal = P(1, n+1);
+    runtimeBest = toc(t);
+    nPop = 1;
+
+    while toc(t) < timeLimit
+        nPop = nPop + 1;
+        P_prime = zeros(P_size, n+1);
+
+        for i = 1:P_size
+            idx1 = randi(P_size, 1, k);
+            parent1 = P(min(idx1), 1:n);
+
+            idx2 = randi(P_size, 1, k);
+            parent2 = P(min(idx2), 1:n);
+
+            combined = union(parent1, parent2);
+            offspring = combined(randperm(length(combined), n));
+
+            if rand < q
+                others = setdiff(Candidates, offspring);
+                offspring(randi(n)) = others(randi(length(others)));
+            end
+
+            P_prime(i, 1:n) = offspring;
+            P_prime(i, n+1) = calculateFitness(G, offspring, Wmax, Cmax);
+        end
+
+        P_prime = sortrows(P_prime, n+1);
+        new_P = [P(1:m, :); P_prime(1:(P_size-m), :)];
+        P = sortrows(new_P, n+1);
+
+        if P(1, n+1) < bestVal
+            bestVal = P(1, n+1);
+            sBest = P(1, 1:n);
+            runtimeBest = toc(t);
         end
     end
-    fprintf('Iterações do f3 (Random Search): %d\n', counter);
+end
+
+
+function val = calculateFitness(G, sNodes, Wmax, Cmax)
+    [avgNS, maxNS, maxSS] = ObjectiveSNSP(G, sNodes, true, true, true);
+    val = avgNS;
+    if maxNS > Wmax, val = val + 100 * (maxNS - Wmax); end
+    if maxSS > Cmax, val = val + 100 * (maxSS - Cmax); end
 end
