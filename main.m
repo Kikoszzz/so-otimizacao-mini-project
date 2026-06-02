@@ -13,7 +13,6 @@ Cmax = 500;
 timeLimit = 60;
 
 alpha = 0.3;
-
 P_size = 100; q = 0.1; m = 5; k = 2;
 
 [sBest_grasp, iterations_grasp] = grasp(G, Candidates, n, alpha, Wmax, Cmax, timeLimit);
@@ -37,7 +36,7 @@ function [sBest, iterations] = grasp(G, Candidates, n, alpha, Wmax, Cmax, timeLi
 
     while toc(t) < timeLimit
         s = greedyRandomized(G, Candidates, n, alpha);
-        [s, sVal] = sa_hc_def1(G, s, Wmax, Cmax);
+        [s, sVal] = sa_hc_def1(G, s, Candidates, Wmax, Cmax);
 
         if sVal < bestVal
             bestVal = sVal;
@@ -59,9 +58,8 @@ function sNodes = greedyRandomized(G, Candidates, n, alpha)
         costs = zeros(1, nRem);
         for i = 1:nRem
             partial = [sNodes, remaining(i)];
-            D = distances(G, partial);
-            minDelays = min(D, [], 1);
-            costs(i) = mean(minDelays);
+            [avgNS, ~, ~] = ObjectiveSNSP(G, partial, true, false, false);
+            costs(i) = avgNS;
         end
 
         cMin = min(costs);
@@ -73,16 +71,14 @@ function sNodes = greedyRandomized(G, Candidates, n, alpha)
 end
 
 
-function [sNodes, objVal] = sa_hc_def1(G, sNodes, Wmax, Cmax)
-    nNodes = numnodes(G);
-
+function [sNodes, objVal] = sa_hc_def1(G, sNodes, Candidates, Wmax, Cmax)
     objVal = calculateFitness(G, sNodes, Wmax, Cmax);
 
     improved = true;
 
     while improved
         improved = false;
-        Others = setdiff(1:nNodes, sNodes);
+        Others = setdiff(Candidates, sNodes);
         bestVal = objVal;
         bestNeighbor = sNodes;
 
