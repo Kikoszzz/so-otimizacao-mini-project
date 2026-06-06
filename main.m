@@ -1,3 +1,9 @@
+% Script principal modificado para executar 10 vezes e guardar output em output.txt
+
+% Abrir arquivo para escrita
+fileID = fopen('output.txt', 'w');
+
+% Carregar dados (uma vez, fora do loop)
 Nodes = load("Nodes200.txt");
 Links = load("Links200.txt");
 L = load("L200.txt");
@@ -15,18 +21,30 @@ timeLimit = 60;
 alpha = 0.3;
 P_size = 100; q = 0.1; m = 5; k = 2;
 
-[sBest_grasp, iterations_grasp] = grasp(G, Candidates, n, alpha, Wmax, Cmax, timeLimit);
-[avgNS_grasp, maxNS_grasp, maxSS_grasp] = ObjectiveSNSP(G, sBest_grasp, true, true, true);
+% Executar 10 runs
+for run = 1:10
+    fprintf(fileID, '========== RUN %d ==========\n', run);
+    
+    % GRASP
+    [sBest_grasp, iterations_grasp] = grasp(G, Candidates, n, alpha, Wmax, Cmax, timeLimit);
+    [avgNS_grasp, maxNS_grasp, maxSS_grasp] = ObjectiveSNSP(G, sBest_grasp, true, true, true);
+    
+    % GA
+    [sBest_ga, nPop_ga, runtimeBest_ga] = ga(G, Candidates, n, P_size, q, m, k, Wmax, Cmax, timeLimit);
+    [avgNS_ga, maxNS_ga, maxSS_ga] = ObjectiveSNSP(G, sBest_ga, true, true, true);
+    
+    % Escrever resultados no arquivo
+    fprintf(fileID, "GRASP - alpha = %.2f, iterations = %d\n", alpha, iterations_grasp);
+    fprintf(fileID, "avgNS = %.2f\t maxNS = %d\t maxSS = %d\n\n", avgNS_grasp, maxNS_grasp, maxSS_grasp);
+    
+    fprintf(fileID, "GA - populations = %d, runtimeBest = %.2f\n", nPop_ga, runtimeBest_ga);
+    fprintf(fileID, "avgNS = %.2f\t maxNS = %d\t maxSS = %d\n\n", avgNS_ga, maxNS_ga, maxSS_ga);
+end
 
-[sBest_ga, nPop_ga, runtimeBest_ga] = ga(G, Candidates, n, P_size, q, m, k, Wmax, Cmax, timeLimit);
-[avgNS_ga, maxNS_ga, maxSS_ga] = ObjectiveSNSP(G, sBest_ga, true, true, true);
+fclose(fileID);
+disp('Execução concluída. Resultados salvos em output.txt');
 
-fprintf("GRASP - alpha = %.2f, iterations = %d\n", alpha, iterations_grasp);
-fprintf("avgNS = %.2f\t maxNS = %d\t maxSS = %d\n\n", avgNS_grasp, maxNS_grasp, maxSS_grasp);
-
-fprintf("GA - populations = %d, runtimeBest = %.2f\n", nPop_ga, runtimeBest_ga);
-fprintf("avgNS = %.2f\t maxNS = %d\t maxSS = %d\n\n", avgNS_ga, maxNS_ga, maxSS_ga);
-
+%% ------------------- Funções auxiliares (mantidas inalteradas) -------------------
 
 function [sBest, iterations] = grasp(G, Candidates, n, alpha, Wmax, Cmax, timeLimit)
     t = tic;
@@ -46,7 +64,6 @@ function [sBest, iterations] = grasp(G, Candidates, n, alpha, Wmax, Cmax, timeLi
         iterations = iterations + 1;
     end
 end
-
 
 function sNodes = greedyRandomized(G, Candidates, n, alpha)
     sNodes = [];
@@ -69,7 +86,6 @@ function sNodes = greedyRandomized(G, Candidates, n, alpha)
         sNodes = [sNodes, RCL(randi(length(RCL)))];
     end
 end
-
 
 function [sNodes, objVal] = sa_hc_def1(G, sNodes, Candidates, Wmax, Cmax)
     objVal = calculateFitness(G, sNodes, Wmax, Cmax);
@@ -102,7 +118,6 @@ function [sNodes, objVal] = sa_hc_def1(G, sNodes, Candidates, Wmax, Cmax)
         end
     end
 end
-
 
 function [sBest, nPop, runtimeBest] = ga(G, Candidates, n, P_size, q, m, k, Wmax, Cmax, timeLimit)
     t = tic;
@@ -156,7 +171,6 @@ function [sBest, nPop, runtimeBest] = ga(G, Candidates, n, P_size, q, m, k, Wmax
         end
     end
 end
-
 
 function val = calculateFitness(G, sNodes, Wmax, Cmax)
     [avgNS, maxNS, maxSS] = ObjectiveSNSP(G, sNodes, true, true, true);
