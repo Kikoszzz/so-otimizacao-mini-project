@@ -15,7 +15,7 @@ Cmax = 500;
 timeLimit = 60;
 
 alpha = 0.3;
-P_size = 150; q = 0.1; m = 5; k = 3;
+P_size = 100; q = 0.1; m = 5; k = 3;
 
 for run = 1:10
     fprintf(fileID, '========== RUN %d ==========\n', run);
@@ -135,9 +135,7 @@ function [sBest, nPop, runtimeBest] = ga(G, Candidates, n, P_size, q, m, k, Wmax
         nPop = nPop + 1;
         P_prime = zeros(P_size, n+1);
 
-        for i = 1:P_size
-            if toc(t) >= timeLimit, break; end
-            
+        for i = 1:P_size            
             idx1 = randi(P_size, 1, k);
             parent1 = P(min(idx1), 1:n);
 
@@ -159,6 +157,8 @@ function [sBest, nPop, runtimeBest] = ga(G, Candidates, n, P_size, q, m, k, Wmax
             P_prime(i, 1:n) = offspring;
             P_prime(i, n+1) = calculateFitness(G, offspring, Wmax, Cmax);
         end
+
+        if toc(t) >= timeLimit, break; end
 
         P_prime = sortrows(P_prime, n+1);
         new_P = [P(1:m, :); P_prime(1:(P_size-m), :)];
