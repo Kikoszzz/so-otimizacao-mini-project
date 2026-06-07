@@ -115,7 +115,7 @@ end
 function [sBest, nPop, runtimeBest] = ga(G, Candidates, n, P_size, q, m, k, Wmax, Cmax, timeLimit)
     t = tic;
     nCandidates = length(Candidates);
-    ls_prob = 0.2; % probabilidade de aplicar local search a cada filho
+    ls_prob = 0.2;
 
     P = zeros(P_size, n+1);
     for i = 1:P_size
