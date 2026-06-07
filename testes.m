@@ -1,9 +1,3 @@
-% Script principal modificado para executar 10 vezes e guardar output em output.txt
-
-% Abrir arquivo para escrita
-fileID = fopen('output.txt', 'w');
-
-% Carregar dados (uma vez, fora do loop)
 Nodes = load("Nodes200.txt");
 Links = load("Links200.txt");
 L = load("L200.txt");
@@ -18,33 +12,83 @@ Wmax = 700;
 Cmax = 500;
 timeLimit = 60;
 
-alpha = 0.3;
-P_size = 150; q = 0.1; m = 5; k = 3;
+% Valores a testar
+alpha_values  = [0.1, 0.3, 0.5, 0.7, 0.9];
+Psize_values  = [50, 100, 150, 200, 250];
+q_values      = [0.05, 0.10, 0.20, 0.30, 0.40];
+m_values      = [1, 3, 5, 7, 10];
+k_values      = [1, 2, 3, 4, 5];
 
-% Executar 10 runs
-for run = 1:10
-    fprintf(fileID, '========== RUN %d ==========\n', run);
-    
-    % GRASP
-    [sBest_grasp, iterations_grasp] = grasp(G, Candidates, n, alpha, Wmax, Cmax, timeLimit);
-    [avgNS_grasp, maxNS_grasp, maxSS_grasp] = ObjectiveSNSP(G, sBest_grasp, true, true, true);
-    
-    % GA
-    [sBest_ga, nPop_ga, runtimeBest_ga] = ga(G, Candidates, n, P_size, q, m, k, Wmax, Cmax, timeLimit);
-    [avgNS_ga, maxNS_ga, maxSS_ga] = ObjectiveSNSP(G, sBest_ga, true, true, true);
-    
-    % Escrever resultados no arquivo
-    fprintf(fileID, "GRASP - alpha = %.2f, iterations = %d\n", alpha, iterations_grasp);
-    fprintf(fileID, "avgNS = %.2f\t maxNS = %d\t maxSS = %d\n\n", avgNS_grasp, maxNS_grasp, maxSS_grasp);
-    
-    fprintf(fileID, "GA - populations = %d, runtimeBest = %.2f\n", nPop_ga, runtimeBest_ga);
-    fprintf(fileID, "avgNS = %.2f\t maxNS = %d\t maxSS = %d\n\n", avgNS_ga, maxNS_ga, maxSS_ga);
+% Settings base para o GA (mantidos fixos enquanto se varia outro)
+alpha_base = 0.3;
+Psize_base = 150; q_base = 0.15; m_base = 3; k_base = 2;
+
+fileID = fopen('settings_test.txt', 'w');
+
+%% GRASP — variar alpha
+fprintf(fileID, '========== GRASP: variar alpha ==========\n');
+for i = 1:length(alpha_values)
+    alpha = alpha_values(i);
+    [sBest, iterations] = grasp(G, Candidates, n, alpha, Wmax, Cmax, timeLimit);
+    [avgNS, maxNS, maxSS] = ObjectiveSNSP(G, sBest, true, true, true);
+    fprintf(fileID, 'alpha=%.2f | iterations=%d | avgNS=%.2f | maxNS=%d | maxSS=%d\n', ...
+        alpha, iterations, avgNS, maxNS, maxSS);
+end
+
+%% GA — variar P_size
+fprintf(fileID, '\n========== GA: variar P_size (q=%.2f, m=%d, k=%d) ==========\n', q_base, m_base, k_base);
+for i = 1:length(Psize_values)
+    P_size = Psize_values(i);
+    [sBest, nPop, runtimeBest] = ga(G, Candidates, n, P_size, q_base, m_base, k_base, Wmax, Cmax, timeLimit);
+    [avgNS, maxNS, maxSS] = ObjectiveSNSP(G, sBest, true, true, true);
+    fprintf(fileID, 'P_size=%d | populations=%d | runtimeBest=%.2f | avgNS=%.2f | maxNS=%d | maxSS=%d\n', ...
+        P_size, nPop, runtimeBest, avgNS, maxNS, maxSS);
+end
+
+%% GA — variar q
+fprintf(fileID, '\n========== GA: variar q (P_size=%d, m=%d, k=%d) ==========\n', Psize_base, m_base, k_base);
+for i = 1:length(q_values)
+    q = q_values(i);
+    [sBest, nPop, runtimeBest] = ga(G, Candidates, n, Psize_base, q, m_base, k_base, Wmax, Cmax, timeLimit);
+    [avgNS, maxNS, maxSS] = ObjectiveSNSP(G, sBest, true, true, true);
+    fprintf(fileID, 'q=%.2f | populations=%d | runtimeBest=%.2f | avgNS=%.2f | maxNS=%d | maxSS=%d\n', ...
+        q, nPop, runtimeBest, avgNS, maxNS, maxSS);
+end
+
+%% GA — variar m
+fprintf(fileID, '\n========== GA: variar m (P_size=%d, q=%.2f, k=%d) ==========\n', Psize_base, q_base, k_base);
+for i = 1:length(m_values)
+    m = m_values(i);
+    [sBest, nPop, runtimeBest] = ga(G, Candidates, n, Psize_base, q_base, m, k_base, Wmax, Cmax, timeLimit);
+    [avgNS, maxNS, maxSS] = ObjectiveSNSP(G, sBest, true, true, true);
+    fprintf(fileID, 'm=%d | populations=%d | runtimeBest=%.2f | avgNS=%.2f | maxNS=%d | maxSS=%d\n', ...
+        m, nPop, runtimeBest, avgNS, maxNS, maxSS);
+end
+
+%% GA — variar k
+fprintf(fileID, '\n========== GA: variar k (P_size=%d, q=%.2f, m=%d) ==========\n', Psize_base, q_base, m_base);
+for i = 1:length(k_values)
+    k = k_values(i);
+    [sBest, nPop, runtimeBest] = ga(G, Candidates, n, Psize_base, q_base, m_base, k, Wmax, Cmax, timeLimit);
+    [avgNS, maxNS, maxSS] = ObjectiveSNSP(G, sBest, true, true, true);
+    fprintf(fileID, 'k=%d | populations=%d | runtimeBest=%.2f | avgNS=%.2f | maxNS=%d | maxSS=%d\n', ...
+        k, nPop, runtimeBest, avgNS, maxNS, maxSS);
 end
 
 fclose(fileID);
-disp('Execução concluída. Resultados salvos em output.txt');
+disp('Testes concluídos. Resultados em settings_test.txt');
 
-%% ------------------- Funções auxiliares (mantidas inalteradas) -------------------
+
+
+
+
+
+% ==================================================
+% ==================================================
+% ==================================================
+
+
+
 
 function [sBest, iterations] = grasp(G, Candidates, n, alpha, Wmax, Cmax, timeLimit)
     t = tic;

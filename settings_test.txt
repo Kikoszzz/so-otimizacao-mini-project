@@ -1,0 +1,34 @@
+========== GRASP: variar alpha ==========
+alpha=0.10 | iterations=50 | avgNS=275.89 | maxNS=694 | maxSS=495
+alpha=0.30 | iterations=61 | avgNS=275.89 | maxNS=694 | maxSS=495
+alpha=0.50 | iterations=55 | avgNS=275.89 | maxNS=694 | maxSS=495
+alpha=0.70 | iterations=57 | avgNS=275.89 | maxNS=694 | maxSS=495
+alpha=0.90 | iterations=52 | avgNS=275.89 | maxNS=694 | maxSS=495
+
+========== GA: variar P_size (q=0.15, m=3, k=2) ==========
+P_size=50 | populations=8704 | runtimeBest=1.06 | avgNS=279.50 | maxNS=635 | maxSS=498
+P_size=100 | populations=4264 | runtimeBest=1.84 | avgNS=275.89 | maxNS=694 | maxSS=495
+P_size=150 | populations=2842 | runtimeBest=3.08 | avgNS=275.89 | maxNS=694 | maxSS=495
+P_size=200 | populations=2140 | runtimeBest=3.24 | avgNS=275.89 | maxNS=694 | maxSS=495
+P_size=250 | populations=1710 | runtimeBest=1.38 | avgNS=279.50 | maxNS=635 | maxSS=498
+
+========== GA: variar q (P_size=150, m=3, k=2) ==========
+q=0.05 | populations=2879 | runtimeBest=6.03 | avgNS=279.50 | maxNS=635 | maxSS=498
+q=0.10 | populations=2858 | runtimeBest=3.50 | avgNS=275.89 | maxNS=694 | maxSS=495
+q=0.20 | populations=2819 | runtimeBest=8.59 | avgNS=275.89 | maxNS=694 | maxSS=495
+q=0.30 | populations=2690 | runtimeBest=5.39 | avgNS=275.89 | maxNS=694 | maxSS=495
+q=0.40 | populations=2586 | runtimeBest=26.56 | avgNS=275.89 | maxNS=694 | maxSS=495
+
+========== GA: variar m (P_size=150, q=0.15, k=2) ==========
+m=1 | populations=2632 | runtimeBest=5.81 | avgNS=275.89 | maxNS=694 | maxSS=495
+m=3 | populations=2645 | runtimeBest=8.29 | avgNS=275.89 | maxNS=694 | maxSS=495
+m=5 | populations=2649 | runtimeBest=1.20 | avgNS=275.89 | maxNS=694 | maxSS=495
+m=7 | populations=2690 | runtimeBest=1.27 | avgNS=275.89 | maxNS=694 | maxSS=495
+m=10 | populations=2662 | runtimeBest=1.50 | avgNS=275.89 | maxNS=694 | maxSS=495
+
+========== GA: variar k (P_size=150, q=0.15, m=3) ==========
+k=1 | populations=2601 | runtimeBest=32.84 | avgNS=280.50 | maxNS=694 | maxSS=499
+k=2 | populations=2654 | runtimeBest=1.01 | avgNS=279.50 | maxNS=635 | maxSS=498
+k=3 | populations=2821 | runtimeBest=0.96 | avgNS=275.89 | maxNS=694 | maxSS=495
+k=4 | populations=2923 | runtimeBest=0.70 | avgNS=275.89 | maxNS=694 | maxSS=495
+k=5 | populations=2874 | runtimeBest=0.52 | avgNS=275.89 | maxNS=694 | maxSS=495

@@ -1,70 +1,70 @@
 ========== RUN 1 ==========
-GRASP - alpha = 0.30, iterations = 47
+GRASP - alpha = 0.30, iterations = 52
 avgNS = 275.89	 maxNS = 694	 maxSS = 495
 
-GA - populations = 5546, runtimeBest = 2.14
+GA - populations = 3834, runtimeBest = 0.32
 avgNS = 275.89	 maxNS = 694	 maxSS = 495
 
 ========== RUN 2 ==========
-GRASP - alpha = 0.30, iterations = 52
+GRASP - alpha = 0.30, iterations = 53
 avgNS = 275.89	 maxNS = 694	 maxSS = 495
 
-GA - populations = 5568, runtimeBest = 3.01
-avgNS = 275.89	 maxNS = 694	 maxSS = 495
-
-========== RUN 3 ==========
-GRASP - alpha = 0.30, iterations = 46
-avgNS = 275.89	 maxNS = 694	 maxSS = 495
-
-GA - populations = 5600, runtimeBest = 0.39
-avgNS = 275.89	 maxNS = 694	 maxSS = 495
-
-========== RUN 4 ==========
-GRASP - alpha = 0.30, iterations = 46
-avgNS = 275.89	 maxNS = 694	 maxSS = 495
-
-GA - populations = 5608, runtimeBest = 1.15
+GA - populations = 3850, runtimeBest = 0.71
 avgNS = 279.50	 maxNS = 635	 maxSS = 498
 
-========== RUN 5 ==========
+========== RUN 3 ==========
 GRASP - alpha = 0.30, iterations = 49
 avgNS = 275.89	 maxNS = 694	 maxSS = 495
 
-GA - populations = 5590, runtimeBest = 1.75
-avgNS = 280.43	 maxNS = 694	 maxSS = 499
+GA - populations = 3831, runtimeBest = 0.51
+avgNS = 279.50	 maxNS = 635	 maxSS = 498
+
+========== RUN 4 ==========
+GRASP - alpha = 0.30, iterations = 50
+avgNS = 275.89	 maxNS = 694	 maxSS = 495
+
+GA - populations = 3839, runtimeBest = 0.56
+avgNS = 279.50	 maxNS = 635	 maxSS = 498
+
+========== RUN 5 ==========
+GRASP - alpha = 0.30, iterations = 48
+avgNS = 275.89	 maxNS = 694	 maxSS = 495
+
+GA - populations = 3834, runtimeBest = 0.39
+avgNS = 280.50	 maxNS = 694	 maxSS = 499
 
 ========== RUN 6 ==========
-GRASP - alpha = 0.30, iterations = 46
+GRASP - alpha = 0.30, iterations = 49
 avgNS = 275.89	 maxNS = 694	 maxSS = 495
 
-GA - populations = 5631, runtimeBest = 0.46
-avgNS = 279.50	 maxNS = 635	 maxSS = 498
+GA - populations = 3853, runtimeBest = 1.52
+avgNS = 275.89	 maxNS = 694	 maxSS = 495
 
 ========== RUN 7 ==========
-GRASP - alpha = 0.30, iterations = 48
+GRASP - alpha = 0.30, iterations = 51
 avgNS = 275.89	 maxNS = 694	 maxSS = 495
 
-GA - populations = 5585, runtimeBest = 0.47
-avgNS = 279.50	 maxNS = 635	 maxSS = 498
+GA - populations = 3887, runtimeBest = 1.28
+avgNS = 279.43	 maxNS = 694	 maxSS = 500
 
 ========== RUN 8 ==========
-GRASP - alpha = 0.30, iterations = 52
+GRASP - alpha = 0.30, iterations = 50
 avgNS = 275.89	 maxNS = 694	 maxSS = 495
 
-GA - populations = 5587, runtimeBest = 2.35
-avgNS = 275.89	 maxNS = 694	 maxSS = 495
-
-========== RUN 9 ==========
-GRASP - alpha = 0.30, iterations = 48
-avgNS = 275.89	 maxNS = 694	 maxSS = 495
-
-GA - populations = 5610, runtimeBest = 0.94
+GA - populations = 3858, runtimeBest = 0.42
 avgNS = 279.50	 maxNS = 635	 maxSS = 498
 
-========== RUN 10 ==========
+========== RUN 9 ==========
 GRASP - alpha = 0.30, iterations = 47
 avgNS = 275.89	 maxNS = 694	 maxSS = 495
 
-GA - populations = 4362, runtimeBest = 1.28
+GA - populations = 3890, runtimeBest = 0.96
+avgNS = 279.43	 maxNS = 694	 maxSS = 500
+
+========== RUN 10 ==========
+GRASP - alpha = 0.30, iterations = 51
 avgNS = 275.89	 maxNS = 694	 maxSS = 495
+
+GA - populations = 3850, runtimeBest = 1.07
+avgNS = 279.50	 maxNS = 635	 maxSS = 498
 
